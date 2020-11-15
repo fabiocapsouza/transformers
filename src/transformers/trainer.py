@@ -662,14 +662,13 @@ class Trainer:
             try:
                 self.global_step = int(model_path.split("-")[-1].split(os.path.sep)[0])
                 epochs_trained = self.global_step // (len(train_dataloader) // self.args.gradient_accumulation_steps)
-                steps_trained_in_current_epoch = self.global_step % (
-                    len(train_dataloader) // self.args.gradient_accumulation_steps
-                )
+                steps_trained_in_current_epoch = (self.global_step * self.args.gradient_accumulation_steps) % \
+                    len(train_dataloader)
 
                 logger.info("  Continuing training from checkpoint, will skip to saved global_step")
                 logger.info("  Continuing training from epoch %d", epochs_trained)
                 logger.info("  Continuing training from global step %d", self.global_step)
-                logger.info("  Will skip the first %d steps in the first epoch", steps_trained_in_current_epoch)
+                logger.info("  Will skip the first %d batches in the first epoch", steps_trained_in_current_epoch)
             except ValueError:
                 self.global_step = 0
                 logger.info("  Starting fine-tuning.")
